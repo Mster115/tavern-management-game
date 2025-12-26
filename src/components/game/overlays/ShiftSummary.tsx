@@ -1,0 +1,38 @@
+import React from 'react';
+
+interface ShiftSummaryProps {
+    night: number;
+    patronsServed: number;
+    currentShiftGold: number;
+    onNextNight: () => void;
+}
+
+export const ShiftSummary: React.FC<ShiftSummaryProps> = ({ night, patronsServed, currentShiftGold, onNextNight }) => {
+    return (
+        <div className="bg-[#1a120b] p-10 rounded-lg border-4 border-amber-700 shadow-2xl max-w-lg w-full relative overflow-hidden font-serif">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-900 via-amber-500 to-amber-900 opacity-50"></div>
+
+            <h2 className="text-4xl text-amber-100 mb-8 pb-4 border-b-2 border-amber-900/50">Shift Report</h2>
+
+            <div className="space-y-6 mb-10 text-lg">
+                <div className="flex justify-between items-center bg-black/30 p-4 rounded text-amber-200">
+                    <span>Patrons Served</span>
+                    <span className="font-bold text-2xl text-white">{patronsServed}</span>
+                </div>
+                <div className="flex justify-between items-center bg-black/30 p-4 rounded text-amber-200">
+                    <span>Gold Earned</span>
+                    <span className="font-bold text-2xl text-yellow-400 drop-shadow-sm flex items-center gap-2">
+                        +{currentShiftGold} <span className="text-xl">⚱️</span>
+                    </span>
+                </div>
+            </div>
+
+            <button
+                onClick={onNextNight}
+                className="w-full py-4 bg-amber-700 hover:bg-amber-600 text-amber-50 font-bold rounded border-2 border-amber-500/30 shadow-lg transition-colors text-xl uppercase tracking-wider"
+            >
+                Start Night {night + 1}
+            </button>
+        </div>
+    );
+};

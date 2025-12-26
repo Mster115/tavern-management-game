@@ -1,0 +1,64 @@
+import React from 'react';
+import { useGame } from '../../../context/GameContext';
+import { ROUND_DURATION } from '../../../constants/game';
+
+export const HUD: React.FC = () => {
+    const { night, totalGold, timeLeft, scoreLogs } = useGame();
+
+    return (
+        <>
+            {/* Top Bar */}
+            <div className="absolute top-0 left-0 right-0 z-30 flex justify-between items-center p-4 bg-gradient-to-b from-black/90 to-transparent pointer-events-none">
+                <div className="flex gap-6 items-center pointer-events-auto">
+                    <div className="flex flex-col">
+                        <span className="text-xs text-amber-500 uppercase tracking-widest">Night</span>
+                        <span className="text-2xl font-serif text-amber-100">{night}</span>
+                    </div>
+                    <div className="h-8 w-[1px] bg-amber-800/50"></div>
+                    <div className="flex flex-col">
+                        <span className="text-xs text-amber-500 uppercase tracking-widest">Treasury</span>
+                        <span className="text-2xl font-serif text-yellow-500 flex items-center gap-2">
+                            {totalGold} <span className="text-lg">⚱️</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div className="flex flex-col items-end w-48 pointer-events-auto">
+                    <div className="flex justify-between w-full text-xs text-amber-400 mb-1 uppercase tracking-wider font-bold">
+                        <span>Shift Time</span>
+                        <span className={timeLeft < 10 ? "text-red-500 animate-pulse" : ""}>
+                            {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
+                        </span>
+                    </div>
+                    <div className="w-full h-2 bg-amber-950/50 rounded-full overflow-hidden border border-amber-900/30">
+                        <div
+                            className="h-full bg-gradient-to-r from-amber-700 to-amber-500 transition-all duration-1000 ease-linear"
+                            style={{ width: `${(timeLeft / ROUND_DURATION) * 100}%` }}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Round Stats Corner */}
+            <div className="absolute mb-10 bottom-6 left-6 pointer-events-none z-30 flex items-end gap-4">
+                <div className="relative w-32 h-32 bg-black/80 backdrop-blur-md rounded-full border-4 border-amber-600/50 shadow-2xl flex flex-col items-center justify-center group overflow-hidden">
+                    {/* Ring highlight */}
+                    <div className="absolute inset-0 rounded-full border border-white/10" />
+                    <div className="absolute -inset-1 bg-gradient-to-tr from-amber-900/0 via-amber-500/20 to-amber-900/0 animate-spin-slow opacity-50" />
+
+                    <span className="text-[10px] uppercase tracking-widest text-amber-500/80 mb-1">Shift Gold</span>
+                    <span className="text-4xl font-serif text-yellow-400 font-bold drop-shadow-lg tabular-nums">
+                        {Math.floor(totalGold)} {/* Showing Total Gold here for now, could be shift gold */}
+                    </span>
+                    <div className="h-0.5 w-12 bg-amber-800/50 my-1" />
+                    {/* Mini log preview - just showing last action */}
+                    {scoreLogs.length > 0 && (
+                        <div key={scoreLogs[0].id} className="text-[10px] text-amber-200/80 text-center px-4 animate-fadeIn whitespace-nowrap overflow-hidden text-ellipsis w-full">
+                            +{scoreLogs[0].gold} {scoreLogs[0].text}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </>
+    );
+};

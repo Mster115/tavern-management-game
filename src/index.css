@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@theme {
+  --color-tavern-wood: #8B4513;
+  --color-beer-gold: #FFD700;
+  --color-beer-foam: #FFFACD;
+  --font-medieval: "Times New Roman", serif;
+
+  --animate-fadeIn: fadeIn 0.5s ease-out;
+  --animate-slideInLeft: slideInLeft 0.3s ease-out;
+  --animate-slideInRight: slideInRight 0.3s ease-out;
+  --animate-bounce: bounce 1s infinite;
+  --animate-patience: patience-decay linear forwards;
+}
+
+@layer utilities {
+  .text-shadow-lg {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  .mask-linear-fade {
+    mask-image: linear-gradient(to bottom, transparent, black 20%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes patience-decay {
+  from {
+    width: 100%;
+    background-color: #22c55e;
+  }
+
+  /* green-500 */
+  50% {
+    background-color: #fab005;
+  }
+
+  /* amber-500 */
+  to {
+    width: 0%;
+    background-color: #ef4444;
+  }
+
+  /* red-500 */
+}
+
+@layer base {
+  body {
+    background-color: var(--color-zinc-900);
+    color: var(--color-amber-50);
+  }
+}
