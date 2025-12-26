@@ -15,7 +15,7 @@ export const ActivePatron: React.FC = () => {
     const patiencePercent = activePatron ? (activePatron.patience / MAX_PATIENCE) * 100 : 0;
 
     return (
-        <div className="absolute top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] pointer-events-none z-0 flex items-center justify-center">
+        <div className="absolute top-[42%] left-[35%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] pointer-events-none z-0 flex items-center justify-center">
             {activePatron && (
                 <div className="relative w-full h-full animate-fadeIn flex items-center justify-center">
                     <div className={`relative flex flex-col items-center ${feedback ? 'scale-110 transition-transform duration-300' : ''}`}>
@@ -33,7 +33,7 @@ export const ActivePatron: React.FC = () => {
                     </div>
 
                     {/* Patience Meter above head */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-2 bg-gray-900/50 rounded-full border border-white/10 overflow-hidden">
+                    <div className="absolute top-28 left-1/2 -translate-x-1/2 w-48 h-2 bg-gray-900/50 rounded-full border border-white/10 overflow-hidden z-20">
                         <div
                             className={`h-full transition-all duration-1000 ease-linear ${patiencePercent > 50 ? 'bg-green-500' :
                                 patiencePercent > 20 ? 'bg-amber-500' : 'bg-red-600'

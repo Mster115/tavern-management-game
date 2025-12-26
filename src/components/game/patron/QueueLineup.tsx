@@ -11,7 +11,7 @@ export const QueueLineup: React.FC = () => {
     const visibleQueue = queue.slice(0, 4);
 
     return (
-        <div className="absolute right-8 bottom-32 h-32 flex flex-row items-end z-10 pointer-events-none">
+        <div className="absolute right-8 bottom-32 h-32 flex flex-row items-end z-40 pointer-events-none">
             <AnimatePresence mode='popLayout'>
                 {visibleQueue.map((patron, index) => {
                     // Calculate offset for perspective/lineup effect
@@ -32,7 +32,7 @@ export const QueueLineup: React.FC = () => {
                         >
                             {/* Speech bubble for angry patrons */}
                             {isAngry && (
-                                <div className="absolute -top-8 right-0 bg-white border border-red-500 rounded-lg px-2 py-1 shadow-sm animate-bounce z-20">
+                                <div className="absolute -top-8 right-0 bg-white border border-red-500 rounded-lg px-2 py-1 shadow-sm animate-bounce z-30">
                                     <span className="text-red-600 text-[10px] font-bold">!!!</span>
                                 </div>
                             )}
