@@ -27,7 +27,7 @@ const WineStationComponent: React.FC = () => {
     useEffect(() => {
         if (isBottleOpen) {
             setJustOpened(true);
-            const timer = setTimeout(() => setJustOpened(false), 500);
+            const timer = setTimeout(() => setJustOpened(false), 100); // 100ms is enough to separate click, but feels instant
             return () => clearTimeout(timer);
         }
     }, [isBottleOpen]);

@@ -1,4 +1,4 @@
-export type GameState = 'START_SCREEN' | 'SHIFT_INTRO' | 'PLAYING' | 'SHIFT_SUMMARY';
+export type GameState = 'START_SCREEN' | 'SHIFT_INTRO' | 'PLAYING' | 'SHIFT_SUMMARY' | 'GAME_OVER';
 
 export type PatronType = 'PEASANT' | 'KNIGHT' | 'NOBLE' | 'WIZARD' | 'ROYAL';
 export type DrinkType = 'ALE' | 'WINE';
@@ -34,6 +34,8 @@ export interface GameContextType {
     totalGold: number;
     currentShiftGold: number;
     patronsServed: number;
+    angryPatronCount: number;
+    angryLimit: number; // Dynamic limit based on night
     queue: Patron[];
     activePatron: Patron | null;
     scoreLogs: ScoreLog[];
@@ -43,6 +45,9 @@ export interface GameContextType {
     // Actions
     startShift: () => void;
     nextNight: () => void;
+    retryNight: () => void;
+    resetGame: () => void;
     submitPour: (accuracyMetric: number, drinkType: import('./game').DrinkType) => void;
     spawnPatron: () => void;
+    registerAngryPatron: () => void;
 }

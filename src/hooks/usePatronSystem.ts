@@ -8,7 +8,7 @@ import {
 import { generatePatron } from '../utils/patronGenerator';
 import { DifficultyStrategy } from '../strategies/difficulty';
 
-export const usePatronSystem = (gameState: GameState, night: number) => {
+export const usePatronSystem = (gameState: GameState, night: number, onPatronAngry: () => void, isPaused: boolean = false) => {
     const [queue, setQueue] = useState<Patron[]>([]);
     const [activePatron, setActivePatron] = useState<Patron | null>(null);
     const spawnerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -22,7 +22,7 @@ export const usePatronSystem = (gameState: GameState, night: number) => {
     }, [gameState]);
 
     const spawnPatron = useCallback((isInitial = false) => {
-        if (!isInitial && gameStateRef.current !== 'PLAYING') return;
+        if (!isInitial && (gameStateRef.current !== 'PLAYING')) return; // Removed isPaused check for spawning? Or should we stop spawning too? Probably let spawn timer run, but maybe pause logic? Let's keep simple.
 
         const newPatron = generatePatron(night);
         setQueue(prev => [...prev, newPatron]);
@@ -36,32 +36,42 @@ export const usePatronSystem = (gameState: GameState, night: number) => {
         if (gameState !== 'PLAYING') return;
 
         const interval = setInterval(() => {
-            // Update Queue Patience
+            // Update Queue Patience (ALWAYS runs, even during feedback)
             setQueue(prev => prev.map(p => {
                 if (p.status === 'leaving') return p;
 
-                const baseDecay = DifficultyStrategy.getPatienceDecay(DECAY_PER_SEC, p.patienceMultiplier);
+                const baseDecay = DifficultyStrategy.getPatienceDecay(DECAY_PER_SEC, p.patienceMultiplier, night);
                 const newPatience = Math.max(0, p.patience - baseDecay);
                 const nextStatus = newPatience === 0 ? 'angry' : p.status;
+
+                if (nextStatus === 'angry' && p.status !== 'angry') {
+                    onPatronAngry();
+                }
 
                 return { ...p, patience: newPatience, status: nextStatus as any };
             }));
 
-            // Update Active Patron Patience
-            setActivePatron(prev => {
-                if (!prev || prev.status === 'leaving') return prev;
+            // Update Active Patron Patience (PAUSED during feedback)
+            if (!isPaused) {
+                setActivePatron(prev => {
+                    if (!prev || prev.status === 'leaving') return prev;
 
-                // Active patrons also lose patience while waiting for their drink
-                const baseDecay = DifficultyStrategy.getPatienceDecay(DECAY_PER_SEC, prev.patienceMultiplier);
-                const newPatience = Math.max(0, prev.patience - baseDecay);
-                const nextStatus = newPatience === 0 ? 'angry' : prev.status;
+                    // Active patrons also lose patience while waiting for their drink
+                    const baseDecay = DifficultyStrategy.getPatienceDecay(DECAY_PER_SEC, prev.patienceMultiplier, night);
+                    const newPatience = Math.max(0, prev.patience - baseDecay);
+                    const nextStatus = newPatience === 0 ? 'angry' : prev.status;
 
-                return { ...prev, patience: newPatience, status: nextStatus as any };
-            });
+                    if (nextStatus === 'angry' && prev.status !== 'angry') {
+                        onPatronAngry();
+                    }
+
+                    return { ...prev, patience: newPatience, status: nextStatus as any };
+                });
+            }
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [gameState]);
+    }, [gameState, isPaused, night]);
 
     // Handle Departure (when status is angry)
     useEffect(() => {

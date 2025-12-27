@@ -3,9 +3,10 @@ import { useGame } from '../../../context/GameContext';
 import { StartScreen } from './StartScreen';
 import { ShiftIntro } from './ShiftIntro';
 import { ShiftSummary } from './ShiftSummary';
+import { GameOverScreen } from './GameOverScreen';
 
 export const Overlays: React.FC = () => {
-    const { gameState, night, totalGold, patronsServed, currentShiftGold, startShift, nextNight } = useGame();
+    const { gameState, night, totalGold, patronsServed, currentShiftGold, startShift, nextNight, resetGame, angryPatronCount, angryLimit } = useGame();
 
     if (gameState === 'PLAYING') return null;
 
@@ -31,6 +32,17 @@ export const Overlays: React.FC = () => {
                     patronsServed={patronsServed}
                     currentShiftGold={currentShiftGold}
                     onNextNight={nextNight}
+                />
+            )}
+
+            {gameState === 'GAME_OVER' && (
+                <GameOverScreen
+                    night={night}
+                    totalGold={totalGold}
+                    patronsServed={patronsServed}
+                    angryCount={angryPatronCount}
+                    limit={angryLimit}
+                    onReset={resetGame}
                 />
             )}
         </div>
