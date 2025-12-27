@@ -11,8 +11,12 @@ export const Overlays: React.FC = () => {
     if (gameState === 'PLAYING') return null;
 
     return (
-        <div className="absolute inset-0 bg-black/80 z-50 flex flex-col items-center justify-center text-center animate-fadeIn font-serif">
-            <h1 className="text-6xl text-amber-500 mb-4 tracking-widest drop-shadow-md">Ye Olde Golden Hearth</h1>
+        <div className="absolute inset-0 bg-black/80 z-50 flex flex-col items-center justify-center text-center animate-fadeIn font-serif px-4">
+            {gameState !== 'GAME_OVER' && (
+                <h1 className="text-4xl md:text-6xl text-amber-500 mb-4 tracking-widest drop-shadow-md">
+                    Ye Olde<br className="md:hidden" /> Golden Hearth
+                </h1>
+            )}
 
             {gameState === 'START_SCREEN' && (
                 <StartScreen
