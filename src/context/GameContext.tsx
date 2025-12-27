@@ -107,7 +107,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const unlockedDrinks: import('../types/game').DrinkType[] = ['ALE'];
     if (night >= 2) unlockedDrinks.push('WINE');
 
-    const value = {
+    const value = React.useMemo(() => ({
         gameState,
         night,
         timeLeft,
@@ -124,7 +124,25 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         nextNight,
         submitPour,
         spawnPatron
-    };
+    }), [
+        gameState,
+        night,
+        timeLeft,
+        maxTime,
+        totalGold,
+        currentShiftGold,
+        patronsServed,
+        queue,
+        activePatron,
+        scoreLogs,
+        feedback,
+        // unlockedDrinks is derived from night, so it's stable if night is stable
+        // functions are memoized/stable
+        startShift,
+        nextNight,
+        submitPour,
+        spawnPatron
+    ]);
 
     return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 };

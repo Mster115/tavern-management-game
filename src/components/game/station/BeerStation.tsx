@@ -4,7 +4,7 @@ import { useGame } from '../../../context/GameContext';
 import { TARGET_POUR_LEVEL } from '../../../constants/game';
 import { usePourMechanic } from '../../../hooks/usePourMechanic';
 
-export const BeerStation: React.FC = () => {
+const BeerStationComponent: React.FC = () => {
     const { gameState, activePatron, feedback, submitPour } = useGame();
 
     const { fillLevel, isPouring, startPouring, stopPouring } = usePourMechanic({
@@ -47,3 +47,5 @@ export const BeerStation: React.FC = () => {
         </div>
     );
 };
+
+export const BeerStation = React.memo(BeerStationComponent);

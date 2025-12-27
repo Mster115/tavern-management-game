@@ -7,7 +7,7 @@ interface PatronAvatarProps {
     className?: string;
 }
 
-export const PatronAvatar: React.FC<PatronAvatarProps> = ({ type, isAngry, className = "" }) => {
+export const PatronAvatarComponent: React.FC<PatronAvatarProps> = ({ type, isAngry, className = "" }) => {
     // Advanced Colors & Gradients based on Type
     const getTheme = () => {
         switch (type) {
@@ -85,7 +85,7 @@ export const PatronAvatar: React.FC<PatronAvatarProps> = ({ type, isAngry, class
 
             {/* Simple Hood/Cowl - improved shape */}
             <path d="M18,50 Q18,28 50,22 Q82,28 82,50 L82,72 Q78,68 72,65 L28,65 Q22,68 18,72 Z" fill={theme.hat} stroke={theme.detail} strokeWidth="1" />
-            
+
             {/* Hood shadow/depth */}
             <ellipse cx="50" cy="50" rx="32" ry="38" fill="#000" opacity="0.1" />
 
@@ -94,7 +94,7 @@ export const PatronAvatar: React.FC<PatronAvatarProps> = ({ type, isAngry, class
 
             {/* Messy peasant hair */}
             <path d="M24,42 Q22,32 30,28 Q38,25 50,24 Q62,25 70,28 Q78,32 76,42 L72,38 Q65,35 50,34 Q35,35 28,38 Z" fill={theme.hair} />
-            
+
             {/* Hair strands for texture */}
             <path d="M30,28 Q35,26 40,28" stroke={theme.detail} strokeWidth="0.5" fill="none" opacity="0.3" />
             <path d="M50,24 Q55,23 60,25" stroke={theme.detail} strokeWidth="0.5" fill="none" opacity="0.3" />
@@ -175,7 +175,7 @@ export const PatronAvatar: React.FC<PatronAvatarProps> = ({ type, isAngry, class
         <g filter="url(#shadow)">
             {/* Body/Robes with more dramatic folds */}
             <path d="M20,120 L25,80 Q20,60 30,50 L70,50 Q80,60 75,80 L80,120 Z" fill={theme.tunic} stroke={theme.detail} strokeWidth="0.5" />
-            
+
             {/* Robe details - mystical patterns */}
             <path d="M30,70 Q50,75 70,70" stroke="#9575cd" strokeWidth="1" fill="none" opacity="0.5" />
             <path d="M28,90 Q50,95 72,90" stroke="#9575cd" strokeWidth="1" fill="none" opacity="0.5" />
@@ -203,7 +203,7 @@ export const PatronAvatar: React.FC<PatronAvatarProps> = ({ type, isAngry, class
 
                 {/* Bushy beard with more detail */}
                 <path d="M35,65 Q30,73 32,80 Q35,87 42,88 Q46,90 50,90 Q54,90 58,88 Q65,87 68,80 Q70,73 65,65 L62,70 L58,68 L54,70 L50,72 L46,70 L42,68 L38,70 Z" fill={theme.hair} stroke={theme.detail} strokeWidth="0.5" opacity="0.95" />
-                
+
                 {/* Beard texture */}
                 <path d="M40,75 Q45,78 50,78" stroke="#fff" strokeWidth="0.3" opacity="0.2" />
                 <path d="M42,82 Q48,84 54,82" stroke="#fff" strokeWidth="0.3" opacity="0.2" />
@@ -321,3 +321,5 @@ export const PatronAvatar: React.FC<PatronAvatarProps> = ({ type, isAngry, class
         </svg>
     );
 };
+
+export const PatronAvatar = React.memo(PatronAvatarComponent);

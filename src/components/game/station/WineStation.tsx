@@ -7,7 +7,7 @@ import { usePourMechanic } from '../../../hooks/usePourMechanic';
 const WINE_TARGET_LEVEL = 50;
 const UNCORK_CLICKS_REQUIRED = 3;
 
-export const WineStation: React.FC = () => {
+const WineStationComponent: React.FC = () => {
     const { gameState, activePatron, feedback, submitPour } = useGame();
     const [corksRemoved, setCorksRemoved] = useState(0);
 
@@ -129,3 +129,5 @@ export const WineStation: React.FC = () => {
         </div>
     );
 };
+
+export const WineStation = React.memo(WineStationComponent);

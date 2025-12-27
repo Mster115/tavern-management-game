@@ -82,5 +82,17 @@
   body {
     background-color: var(--color-zinc-900);
     color: var(--color-amber-50);
+    
+    /* Mobile Game Optimization */
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -webkit-touch-callout: none; /* Disable context menu on iOS */
+    touch-action: none; /* Disable browser handling of gestures (pan/zoom) */
+    overscroll-behavior: none; /* Disable pull-to-refresh / bounce */
+  }
+
+  /* Prevent saving images via long-press */
+  img {
+    pointer-events: none;
   }
 }

@@ -9,7 +9,7 @@ interface PatronVisualProps {
     variant?: 'full' | 'icon';
 }
 
-export const PatronVisual: React.FC<PatronVisualProps> = ({ patron, isAngry, variant = 'full' }) => {
+export const PatronVisualComponent: React.FC<PatronVisualProps> = ({ patron, isAngry, variant = 'full' }) => {
     const { type } = patron;
 
     // Animation variants
@@ -56,3 +56,5 @@ export const PatronVisual: React.FC<PatronVisualProps> = ({ patron, isAngry, var
         </motion.div>
     );
 };
+
+export const PatronVisual = React.memo(PatronVisualComponent);
