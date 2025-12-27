@@ -11,7 +11,7 @@ export const QueueLineup: React.FC = () => {
     const visibleQueue = queue.slice(0, 4);
 
     return (
-        <div className="absolute right-8 bottom-32 h-32 flex flex-row items-end z-40 pointer-events-none">
+        <div className="absolute right-2 sm:right-8 bottom-24 sm:bottom-32 h-24 sm:h-32 flex flex-row items-end z-40 pointer-events-none">
             <AnimatePresence mode='popLayout'>
                 {visibleQueue.map((patron, index) => {
                     // Calculate offset for perspective/lineup effect
@@ -64,7 +64,7 @@ export const QueueLineup: React.FC = () => {
                                 <PatronAvatar
                                     type={patron.type}
                                     isAngry={isAngry}
-                                    className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24"
+                                    className="w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24"
                                 />
                             </div>
 

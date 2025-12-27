@@ -8,7 +8,7 @@ import { Overlays } from './overlays/Overlays';
 
 const GameLayer: React.FC = () => {
     return (
-        <div className="relative w-full h-full overflow-hidden bg-[#0f0a05] select-none font-sans text-amber-50">
+        <div className="relative w-full h-full overflow-hidden bg-[#0f0a05] select-none font-sans text-amber-50 supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh]">
             {/* Background Layer */}
             <div
                 className="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-[60s] ease-linear transform scale-110"

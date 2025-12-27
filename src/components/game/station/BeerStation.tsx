@@ -40,7 +40,7 @@ export const BeerStation: React.FC = () => {
 
             {/* Hint */}
             {!isPouring && fillLevel === 0 && activePatron && (
-                <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 animate-pulse text-amber-200/80 text-xs tracking-[0.2em] font-bold uppercase whitespace-nowrap z-50 pointer-events-none">
+                <div className="absolute -bottom-8 sm:-bottom-12 left-1/2 -translate-x-1/2 animate-pulse text-amber-200/80 text-[10px] sm:text-xs tracking-[0.2em] font-bold uppercase whitespace-nowrap z-50 pointer-events-none">
                     Hold to Fill
                 </div>
             )}

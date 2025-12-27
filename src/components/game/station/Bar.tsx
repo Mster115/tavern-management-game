@@ -24,14 +24,14 @@ export const Bar: React.FC = () => {
 
             {/* 3. Front Face (The Body) */}
             <div
-                className="relative z-10 w-full max-w-4xl h-48 bg-[#2d1b15] shadow-[0_-4px_10px_rgba(0,0,0,0.5)] flex flex-col items-center"
+                className="relative z-10 w-full max-w-4xl h-32 sm:h-48 bg-[#2d1b15] shadow-[0_-4px_10px_rgba(0,0,0,0.5)] flex flex-col items-center"
                 style={{
                     background: 'repeating-linear-gradient(90deg, #2d1b15 0px, #2d1b15 48px, #1a0f0b 50px, #3e2723 52px)'
                 }}
             >
                 {/* Decorative horizontal beams */}
-                <div className="w-full h-4 bg-[#1a0f0b]/50 mt-8 backdrop-blur-sm" />
-                <div className="w-full h-8 bg-[#1a0f0b]/30 mt-16" />
+                <div className="w-full h-3 sm:h-4 bg-[#1a0f0b]/50 mt-4 sm:mt-8 backdrop-blur-sm" />
+                <div className="w-full h-6 sm:h-8 bg-[#1a0f0b]/30 mt-12 sm:mt-16" />
 
                 {/* Bottom fade for seamless screen edge */}
                 <div className="absolute bottom-0 w-full h-24 bg-gradient-to-t from-black via-black/50 to-transparent" />
