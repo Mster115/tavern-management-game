@@ -1,4 +1,3 @@
-import { MAX_SPAWN_INTERVAL, MIN_SPAWN_INTERVAL } from "../constants/game";
 
 export const DifficultyStrategy = {
     /**

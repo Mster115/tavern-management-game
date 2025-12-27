@@ -93,13 +93,16 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ night, totalGold
                             <span className="text-xs uppercase tracking-wider text-red-300">Total Gold</span>
                             <span className="text-3xl text-yellow-400 font-bold">{totalGold}</span>
                         </div>
+                        <div className="flex flex-col col-span-2">
+                            <span className="text-xs uppercase tracking-wider text-red-300">Patrons Served</span>
+                            <span className="text-2xl text-amber-100">{patronsServed}</span>
+                        </div>
                         <div className="flex flex-col col-span-2 border-t border-red-800/30 pt-4">
                             <span className="text-xs uppercase tracking-wider text-red-300">Cause of Riot</span>
                             <div className="flex items-center gap-2">
-                                <span className="text-3xl text-red-500 font-black">{angryCount} / {limit}</span>
+                                <span className="text-3xl text-red-500 font-black">{angryCount}</span>
                                 <span className="text-sm text-red-300 uppercase tracking-widest">Angry Patrons</span>
                             </div>
-                            <span className="text-[10px] text-red-400/50 uppercase mt-1">Allowed per shift</span>
                         </div>
                     </div>
                 </div>
