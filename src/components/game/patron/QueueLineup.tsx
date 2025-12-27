@@ -7,82 +7,85 @@ import { motion, AnimatePresence } from 'framer-motion';
 export const QueueLineup: React.FC = () => {
     const { queue } = useGame();
 
-    // Limit visible queue to 4 to avoid screen clutter
-    const visibleQueue = queue.slice(0, 4);
+    // Show more people now that they spread out
+    const visibleQueue = queue.slice(0, 6);
 
     return (
-        <div className="absolute right-2 sm:right-8 bottom-24 sm:bottom-32 h-24 sm:h-32 flex flex-row items-end z-40 pointer-events-none">
+        // Filling the Bar:
+        // Positioned in center background.
+        <div className="absolute inset-x-0 bottom-44 sm:bottom-56 h-64 flex items-end justify-center z-0 pointer-events-none perspective-[600px]">
             <AnimatePresence mode='popLayout'>
                 {visibleQueue.map((patron, index) => {
-                    // Calculate offset for perspective/lineup effect
                     const isAngry = patron.status === 'angry';
+                    const patiencePercent = (patron.patience / MAX_PATIENCE) * 100;
+
+                    // Logic for alternating sides
+                    // Index 0 -> Left (closest)
+                    // Index 1 -> Right (closest)
+                    const isLeft = index % 2 === 0;
+                    const layer = Math.floor(index / 2); // 0, 0, 1, 1, 2, 2
+
+                    // Tighter spacing, closer to center (Overlapping active patron slightly)
+                    const baseOffset = 95;
+                    const spacing = 50;
+
+                    const direction = isLeft ? -1 : 1;
+                    const xPosition = (baseOffset + (layer * spacing)) * direction;
+
+                    // Patience Status States
+                    const isCritical = patiencePercent < 25; // Red !
+                    const isConcerned = patiencePercent < 50 && !isCritical; // Yellow ?
 
                     return (
                         <motion.div
                             key={patron.id}
                             layout
-                            initial={{ opacity: 0, x: 50, scale: 0.8 }}
-                            animate={{ opacity: 1, x: 0, scale: 1 - (index * 0.05) }}
-                            exit={{ opacity: 0, x: -20, scale: 0.8 }}
-                            transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
-                            className="relative -ml-6 first:ml-0 flex flex-col items-center group origin-bottom-left"
-                            style={{
-                                zIndex: 10 - index,
+                            initial={{ opacity: 0, x: isLeft ? -200 : 200, scale: 0.8 }}
+                            animate={{
+                                opacity: 1,
+                                x: xPosition,
+                                y: -5 * layer,
+                                scale: 0.95 - (layer * 0.04), // Increased base scale to 0.95
+                                zIndex: 50 - index,
+                                filter: `brightness(${1 - (layer * 0.1)}) blur(${layer * 0.5}px)`
                             }}
+                            exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.3 } }}
+                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                            className="absolute bottom-0 flex flex-col items-center group origin-bottom"
                         >
-                            {/* Speech bubble for angry patrons */}
-                            {isAngry && (
-                                <div className="absolute -top-8 right-0 bg-white border border-red-500 rounded-lg px-2 py-1 shadow-sm animate-bounce z-30">
-                                    <span className="text-red-600 text-[10px] font-bold">!!!</span>
-                                </div>
-                            )}
-
-                            {/* Patience Bar */}
-                            <div className="absolute -top-4 w-16 h-2 bg-gray-800 rounded-full border border-black/50 overflow-hidden z-20">
-                                <motion.div
-                                    className="h-full rounded-full"
-                                    initial={{ width: '100%' }}
-                                    animate={{
-                                        width: `${(patron.patience / MAX_PATIENCE) * 100}%`,
-                                        backgroundColor: patron.patience > 60 ? '#22c55e' : patron.patience > 30 ? '#eab308' : '#ef4444'
-                                    }}
-                                    transition={{ duration: 0.5 }} // Smooth updates
-                                />
-                            </div>
-
-                            {/* Critical Patience Pulse Overlay */}
-                            {patron.patience < 20 && (
-                                <motion.div
-                                    className="absolute -top-4 w-16 h-2 bg-red-500 rounded-full z-10"
-                                    animate={{ opacity: [0, 0.5, 0] }}
-                                    transition={{ duration: 1, repeat: Infinity }}
-                                />
-                            )}
+                            {/* Mood/Patience Indicator - Centered above head */}
+                            <AnimatePresence>
+                                {(isCritical || isConcerned || isAngry) && (
+                                    <motion.div
+                                        initial={{ scale: 0, opacity: 0, y: 10 }}
+                                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                                        exit={{ scale: 0, opacity: 0 }}
+                                        className={`absolute -top-12 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center border-2 shadow-sm z-30
+                                            ${isCritical || isAngry ? 'bg-red-500 border-red-700 animate-pulse' : 'bg-amber-400 border-amber-600'}
+                                        `}
+                                    >
+                                        <span className="text-white font-bold text-lg leading-none font-serif">
+                                            {isAngry ? '!!' : isCritical ? '!' : '?'}
+                                        </span>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
 
                             {/* Avatar */}
-                            <div className={`filter drop-shadow-lg ${isAngry ? 'brightness-75' : ''}`}>
+                            <div className={`filter drop-shadow-xl ${isAngry ? 'grayscale-[0.5]' : ''}`}>
                                 <PatronAvatar
                                     type={patron.type}
                                     isAngry={isAngry}
-                                    className="w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24"
+                                    className="w-24 h-24 sm:w-32 sm:h-32"
                                 />
                             </div>
 
-                            {/* Minimal Name Tag on Hover or Always? Let's hide it unless stuck */}
-                            <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-4 bg-black/50 text-amber-100 text-[10px] px-2 rounded-full whitespace-nowrap backdrop-blur-sm">
-                                {patron.displayName}
-                            </div>
                         </motion.div>
                     );
                 })}
             </AnimatePresence>
 
-            {queue.length > 4 && (
-                <div className="absolute right-0 -bottom-6 bg-[#3e2723] text-amber-100 border-2 border-amber-600 rounded-lg px-3 py-1 shadow-lg flex items-center gap-1 z-20">
-                    <span className="text-xs uppercase font-bold text-amber-500/80 tracking-wider">Queue</span>
-                    <span className="text-lg font-bold">+{queue.length - 4}</span>
-                </div>
-            )}
+
         </div>
     );
 };

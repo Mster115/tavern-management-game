@@ -4,7 +4,7 @@ import { GoldCoin } from './GoldCoin';
 
 
 export const HUD: React.FC = () => {
-    const { night, totalGold, currentShiftGold, timeLeft, maxTime, scoreLogs } = useGame();
+    const { night, totalGold, currentShiftGold, timeLeft, maxTime, scoreLogs, queue } = useGame();
 
     return (
         <>
@@ -40,29 +40,41 @@ export const HUD: React.FC = () => {
                 </div>
             </div>
 
-            {/* Round Stats Corner */}
+            {/* Shift Stats (Bottom Left) */}
             <div className="absolute mb-10 bottom-4 left-4 sm:bottom-6 sm:left-6 pointer-events-none z-30 flex items-end gap-4">
-                <div className="relative w-24 h-24 sm:w-32 sm:h-32 bg-black/80 backdrop-blur-md rounded-full border-4 border-amber-600/50 shadow-2xl flex flex-col items-center justify-center group overflow-hidden">
-                    {/* Ring highlight */}
-                    <div className="absolute inset-0 rounded-full border border-white/10" />
-                    <div className="absolute -inset-1 bg-gradient-to-tr from-amber-900/0 via-amber-500/20 to-amber-900/0 animate-spin-slow opacity-50" />
+                <div className="relative group">
+                    {/* Main Stats Circle */}
+                    <div className="relative w-24 h-24 sm:w-32 sm:h-32 bg-black/80 backdrop-blur-md rounded-full border-4 border-amber-600/50 shadow-2xl flex flex-col items-center justify-center overflow-hidden">
+                        {/* Ring highlight */}
+                        <div className="absolute inset-0 rounded-full border border-white/10" />
+                        <div className="absolute -inset-1 bg-gradient-to-tr from-amber-900/0 via-amber-500/20 to-amber-900/0 animate-spin-slow opacity-50" />
 
-                    <span className="text-[8px] sm:text-[10px] uppercase tracking-widest text-amber-500/80 mb-1">Shift Gold</span>
-                    <span className="text-2xl sm:text-4xl font-serif text-yellow-400 font-bold drop-shadow-lg tabular-nums">
-                        {Math.floor(currentShiftGold)}
-                    </span>
-                    <div className="h-0.5 w-8 sm:w-12 bg-amber-800/50 my-1" />
-                    {/* Mini log preview - just showing last action */}
-                    {scoreLogs.length > 0 && (
-                        <div key={scoreLogs[0].id} className="text-[8px] sm:text-[10px] text-amber-200/80 text-center px-4 animate-fadeIn whitespace-nowrap overflow-hidden text-ellipsis w-full">
-                            <span className="font-bold">+{scoreLogs[0].gold}</span>
-                            <span className="opacity-75 ml-1">
-                                {scoreLogs[0].text}
-                            </span>
+                        <span className="text-[8px] sm:text-[10px] uppercase tracking-widest text-amber-500/80 mb-1">Shift Gold</span>
+                        <span className="text-2xl sm:text-4xl font-serif text-yellow-400 font-bold drop-shadow-lg tabular-nums">
+                            {Math.floor(currentShiftGold)}
+                        </span>
+                        <div className="h-0.5 w-8 sm:w-12 bg-amber-800/50 my-1" />
+                        {/* Mini log preview */}
+                        {scoreLogs.length > 0 && (
+                            <div key={scoreLogs[0].id} className="text-[8px] sm:text-[10px] text-amber-200/80 text-center px-4 animate-fadeIn whitespace-nowrap overflow-hidden text-ellipsis w-full">
+                                <span className="font-bold">+{scoreLogs[0].gold}</span>
+                                <span className="opacity-75 ml-1">
+                                    {scoreLogs[0].text}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Queue Badge - Outside overflow hidden */}
+                    {queue.length > 0 && (
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-black text-amber-500 rounded-full border border-amber-500 shadow-[0_2px_8px_rgba(0,0,0,0.8)] flex items-center justify-center z-50 animate-bounce-subtle px-3 py-0.5 min-w-[2.5rem]">
+                            <span className="text-[10px] sm:text-xs font-bold font-serif whitespace-nowrap tracking-wide drop-shadow-sm uppercase">Queue: {queue.length}</span>
                         </div>
                     )}
                 </div>
             </div>
+
+
         </>
     );
 };
