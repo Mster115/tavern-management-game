@@ -70,11 +70,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     // Scoring Logic
-    const submitPour = useCallback((error: number) => {
+    const submitPour = useCallback((error: number, drinkType: import('../types/game').DrinkType) => {
         if (!activePatron || feedback) return;
 
         // Use ScoringStrategy
-        const result = ScoringStrategy.calculatePourScore(error, activePatron);
+        const result = ScoringStrategy.calculatePourScore(error, activePatron, drinkType);
 
         setTotalGold(prev => prev + result.finalGold);
         setCurrentShiftGold(prev => prev + result.finalGold);
@@ -102,6 +102,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     }, [activePatron, gameState, clearActivePatron, feedback]);
 
+    // Unlocked Drinks Logic
+    // Derived from night, no need for separate state unless we add a shop later
+    const unlockedDrinks: import('../types/game').DrinkType[] = ['ALE'];
+    if (night >= 2) unlockedDrinks.push('WINE');
+
     const value = {
         gameState,
         night,
@@ -114,6 +119,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         activePatron,
         scoreLogs,
         feedback,
+        unlockedDrinks,
         startShift,
         nextNight,
         submitPour,

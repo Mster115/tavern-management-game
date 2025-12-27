@@ -5,9 +5,10 @@ interface UsePourMechanicProps {
     isAllowed: boolean;
     onSubmit: (error: number) => void;
     resetTrigger?: any;
+    targetLevel?: number;
 }
 
-export const usePourMechanic = ({ isAllowed, onSubmit, resetTrigger }: UsePourMechanicProps) => {
+export const usePourMechanic = ({ isAllowed, onSubmit, resetTrigger, targetLevel = TARGET_POUR_LEVEL }: UsePourMechanicProps) => {
     const [fillLevel, setFillLevel] = useState(0);
     const [isPouring, setIsPouring] = useState(false);
 
@@ -72,10 +73,10 @@ export const usePourMechanic = ({ isAllowed, onSubmit, resetTrigger }: UsePourMe
     const stopPouring = useCallback(() => {
         if (isPouring) {
             setIsPouring(false);
-            const error = Math.abs(fillLevelRef.current - TARGET_POUR_LEVEL);
+            const error = Math.abs(fillLevelRef.current - targetLevel);
             onSubmit(error);
         }
-    }, [isPouring, onSubmit]);
+    }, [isPouring, onSubmit, targetLevel]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {

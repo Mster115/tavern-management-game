@@ -1,4 +1,4 @@
-import type { Patron, PatronType } from '../types/game';
+import type { Patron, PatronType, DrinkType } from '../types/game';
 import { MAX_PATIENCE } from '../constants/game';
 
 const NAMES: Record<PatronType, string[]> = {
@@ -109,6 +109,24 @@ export const generatePatron = (night: number = 1): Patron => {
     const difficultyMod = Math.max(0.5, 1 - ((night - 1) * 0.05));
     patienceMultiplier *= difficultyMod;
 
+    // 6. Drink Preference (Weighted by Class)
+    let desiredDrink: DrinkType = 'ALE';
+
+    if (night >= 2) {
+        // Define preference weights per class
+        // Nobles and Royals prefer Wine
+        const drinkWeights: Record<PatronType, { drink: DrinkType; weight: number }[]> = {
+            PEASANT: [{ drink: 'ALE', weight: 90 }, { drink: 'WINE', weight: 10 }],
+            KNIGHT: [{ drink: 'ALE', weight: 70 }, { drink: 'WINE', weight: 30 }],
+            NOBLE: [{ drink: 'ALE', weight: 30 }, { drink: 'WINE', weight: 70 }],
+            WIZARD: [{ drink: 'ALE', weight: 50 }, { drink: 'WINE', weight: 50 }], // Wizards are wild
+            ROYAL: [{ drink: 'ALE', weight: 10 }, { drink: 'WINE', weight: 90 }]
+        };
+
+        const options = drinkWeights[type].map(o => ({ item: o.drink, weight: o.weight }));
+        desiredDrink = selectWeighted(options);
+    }
+
     return {
         id: Date.now(),
         name,
@@ -118,6 +136,7 @@ export const generatePatron = (night: number = 1): Patron => {
         patience: MAX_PATIENCE,
         patienceMultiplier,
         goldMultiplier,
+        desiredDrink,
         status: 'waiting'
     };
 };

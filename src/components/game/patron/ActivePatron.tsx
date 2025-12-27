@@ -38,6 +38,17 @@ export const ActivePatron: React.FC = () => {
                             <div className="text-xs sm:text-sm font-serif text-amber-500/60 uppercase tracking-widest">
                                 {activePatron.type}
                             </div>
+
+                            {/* Drink Request */}
+                            <div className="mt-1 flex items-center justify-center gap-2">
+                                <span className="text-white/40 text-[10px] uppercase tracking-wider">Wants:</span>
+                                <span className={`font-bold text-xs px-2 py-0.5 rounded ${activePatron.desiredDrink === 'WINE'
+                                        ? 'bg-red-900/50 text-red-200 border border-red-500/30'
+                                        : 'bg-amber-900/50 text-amber-200 border border-amber-500/30'
+                                    }`}>
+                                    {activePatron.desiredDrink || 'ALE'}
+                                </span>
+                            </div>
                         </div>
 
                         <PatronVisual patron={activePatron} isAngry={isAngry} />

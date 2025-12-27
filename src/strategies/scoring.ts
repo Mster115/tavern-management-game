@@ -13,12 +13,16 @@ export const ScoringStrategy = {
     /**
      * seamless scoring logic refactored from GameContext.
      */
-    calculatePourScore: (error: number, activePatron: Patron): ScoreResult => {
+    calculatePourScore: (error: number, activePatron: Patron, servedDrink: import('../types/game').DrinkType): ScoreResult => {
         // 1. Determine Base Reward & Text
         let baseGold = 0;
         let baseText = "";
 
-        if (error <= 1) {
+        // Check correct drink type first
+        if (servedDrink !== activePatron.desiredDrink) {
+            baseGold = 0;
+            baseText = "Wrong Drink!";
+        } else if (error <= 1) {
             baseGold = 25;
             baseText = "Perfect Pour!";
         } else if (error <= TOLERANCE) {

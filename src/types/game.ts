@@ -1,11 +1,13 @@
 export type GameState = 'START_SCREEN' | 'SHIFT_INTRO' | 'PLAYING' | 'SHIFT_SUMMARY';
 
 export type PatronType = 'PEASANT' | 'KNIGHT' | 'NOBLE' | 'WIZARD' | 'ROYAL';
+export type DrinkType = 'ALE' | 'WINE';
 
 export interface Patron {
     id: number;
     name: string;
     type: PatronType;
+    desiredDrink: DrinkType;
     displayName: string;
     arrivalTime: number;
     patience: number;
@@ -36,10 +38,11 @@ export interface GameContextType {
     activePatron: Patron | null;
     scoreLogs: ScoreLog[];
     feedback: string;
+    unlockedDrinks: DrinkType[];
 
     // Actions
     startShift: () => void;
     nextNight: () => void;
-    submitPour: (accuracyMetric: number) => void;
+    submitPour: (accuracyMetric: number, drinkType: import('./game').DrinkType) => void;
     spawnPatron: () => void;
 }

@@ -1,13 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BeerStation } from './BeerStation';
+import { WineStation } from './WineStation';
+import { useGame } from '../../../context/GameContext';
+import type { DrinkType } from '../../../types/game';
 
 export const Bar: React.FC = () => {
+    const { unlockedDrinks } = useGame();
+    const [activeStation, setActiveStation] = useState<DrinkType>('ALE');
+
+    // Only allow switching to unlocked drinks
+    const availableDrinks = unlockedDrinks;
+
     return (
         <div className="absolute bottom-0 left-0 w-full flex flex-col items-center justify-end pointer-events-none">
 
-            {/* 1. The Station (Mug) - Sits on top naturally */}
-            <div className="z-30 mb-[-12px] pointer-events-auto">
-                <BeerStation />
+            {/* Station Selector - Floating above bar */}
+            {availableDrinks.length > 1 && (
+                <div className="absolute right-4 bottom-32 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 sm:bottom-40 z-50 flex gap-2 pointer-events-auto">
+                    {availableDrinks.map(drink => (
+                        <button
+                            key={drink}
+                            onClick={() => setActiveStation(drink)}
+                            className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg font-bold text-xs sm:text-sm shadow-xl transition-all border-2
+                                ${activeStation === drink
+                                    ? 'bg-amber-100 text-amber-900 border-amber-900 scale-110'
+                                    : 'bg-black/50 text-amber-100/50 border-white/10 hover:bg-black/70'
+                                }`}
+                        >
+                            {drink}
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {/* 1. The Station (Mug/Glass) - Sits on top naturally */}
+            <div className="z-30 mb-[-12px] pointer-events-auto min-h-[160px] flex items-end">
+                {activeStation === 'ALE' && <BeerStation />}
+                {activeStation === 'WINE' && <WineStation />}
             </div>
 
             {/* 2. Top Surface (The Counter) */}
