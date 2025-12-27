@@ -13,10 +13,12 @@ export const usePourMechanic = ({ isAllowed, onSubmit, resetTrigger }: UsePourMe
 
     const requestRef = useRef<number | null>(null);
     const fillLevelRef = useRef(0);
+    const lastTimeRef = useRef<number>(0);
 
     const resetPour = useCallback(() => {
         setFillLevel(0);
         fillLevelRef.current = 0;
+        lastTimeRef.current = 0;
         setIsPouring(false);
     }, []);
 
@@ -25,10 +27,23 @@ export const usePourMechanic = ({ isAllowed, onSubmit, resetTrigger }: UsePourMe
         resetPour();
     }, [resetTrigger, resetPour]);
 
-    const animatePour = useCallback(() => {
+    const animatePour = useCallback((time: number) => {
         if (isPouring) {
+            if (lastTimeRef.current === 0) {
+                lastTimeRef.current = time;
+            }
+
+            const deltaTime = time - lastTimeRef.current;
+            lastTimeRef.current = time;
+
+            // Normalize fill rate per second (delta is in ms)
+            // If POUR_FILL_RATE was designed for 60fps, we multiply by (delta / 16.67) or adjust the constant.
+            // Assuming POUR_FILL_RATE is "amount per frame at 60fps", we can convert:
+            // amount_per_ms = POUR_FILL_RATE / 16.667
+            const fillAmount = (deltaTime / 16.667) * POUR_FILL_RATE;
+
             setFillLevel(prev => {
-                const next = prev >= 100 ? 100 : prev + POUR_FILL_RATE;
+                const next = prev >= 100 ? 100 : prev + fillAmount;
                 fillLevelRef.current = next;
                 return next;
             });
@@ -38,6 +53,7 @@ export const usePourMechanic = ({ isAllowed, onSubmit, resetTrigger }: UsePourMe
 
     useEffect(() => {
         if (isPouring) {
+            lastTimeRef.current = 0; // Reset time on start
             requestRef.current = requestAnimationFrame(animatePour);
         } else {
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
@@ -80,6 +96,8 @@ export const usePourMechanic = ({ isAllowed, onSubmit, resetTrigger }: UsePourMe
     return {
         fillLevel,
         isPouring,
-        resetPour
+        resetPour,
+        startPouring,
+        stopPouring
     };
 };

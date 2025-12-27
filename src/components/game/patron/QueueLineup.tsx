@@ -64,7 +64,7 @@ export const QueueLineup: React.FC = () => {
                                 <PatronAvatar
                                     type={patron.type}
                                     isAngry={isAngry}
-                                    className="w-24 h-24"
+                                    className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24"
                                 />
                             </div>
 

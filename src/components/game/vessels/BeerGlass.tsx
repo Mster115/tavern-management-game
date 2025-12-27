@@ -71,7 +71,7 @@ export const BeerGlass: React.FC<DrinkVesselProps> = ({
                     <motion.div
                         initial={{ height: 0 }}
                         animate={{ height: `${Math.min(fillLevel, 100)}%` }}
-                        transition={{ type: 'spring', bounce: 0, damping: 20 }}
+                        transition={{ duration: 0 }}
                         className={`absolute bottom-0 left-0 w-full ${liquidColor} opacity-90`}
                     >
                         {/* Bubbles */}
