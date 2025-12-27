@@ -9,7 +9,6 @@ interface GameOverScreenProps {
     totalGold: number;
     patronsServed: number;
     angryCount: number;
-    limit: number;
     reason: 'LIMIT_REACHED' | 'ROYAL_SCANDAL' | null;
     onReset: () => void;
 }
@@ -24,7 +23,7 @@ const RIOTERS: { type: PatronType, x: string, y: string, delay: number, duration
     { type: 'NOBLE', x: '85%', y: '30%', delay: 1.2, duration: 2.6 },
 ];
 
-export const GameOverScreen: React.FC<GameOverScreenProps> = ({ night, totalGold, patronsServed, angryCount, limit, reason, onReset }) => {
+export const GameOverScreen: React.FC<GameOverScreenProps> = ({ night, totalGold, patronsServed, angryCount, reason, onReset }) => {
     const [shake, setShake] = useState(false);
 
     useEffect(() => {
