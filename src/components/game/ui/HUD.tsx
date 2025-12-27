@@ -1,9 +1,10 @@
 import React from 'react';
 import { useGame } from '../../../context/GameContext';
-import { ROUND_DURATION } from '../../../constants/game';
+import { GoldCoin } from './GoldCoin';
+
 
 export const HUD: React.FC = () => {
-    const { night, totalGold, timeLeft, scoreLogs } = useGame();
+    const { night, totalGold, currentShiftGold, timeLeft, maxTime, scoreLogs } = useGame();
 
     return (
         <>
@@ -18,7 +19,7 @@ export const HUD: React.FC = () => {
                     <div className="flex flex-col">
                         <span className="text-xs text-amber-500 uppercase tracking-widest">Treasury</span>
                         <span className="text-2xl font-serif text-yellow-500 flex items-center gap-2">
-                            {totalGold} <span className="text-lg">⚱️</span>
+                            {totalGold} <GoldCoin className="w-6 h-6" />
                         </span>
                     </div>
                 </div>
@@ -33,7 +34,7 @@ export const HUD: React.FC = () => {
                     <div className="w-full h-2 bg-amber-950/50 rounded-full overflow-hidden border border-amber-900/30">
                         <div
                             className="h-full bg-gradient-to-r from-amber-700 to-amber-500 transition-all duration-1000 ease-linear"
-                            style={{ width: `${(timeLeft / ROUND_DURATION) * 100}%` }}
+                            style={{ width: `${(timeLeft / maxTime) * 100}%` }}
                         />
                     </div>
                 </div>
@@ -48,13 +49,16 @@ export const HUD: React.FC = () => {
 
                     <span className="text-[10px] uppercase tracking-widest text-amber-500/80 mb-1">Shift Gold</span>
                     <span className="text-4xl font-serif text-yellow-400 font-bold drop-shadow-lg tabular-nums">
-                        {Math.floor(totalGold)} {/* Showing Total Gold here for now, could be shift gold */}
+                        {Math.floor(currentShiftGold)}
                     </span>
                     <div className="h-0.5 w-12 bg-amber-800/50 my-1" />
                     {/* Mini log preview - just showing last action */}
                     {scoreLogs.length > 0 && (
                         <div key={scoreLogs[0].id} className="text-[10px] text-amber-200/80 text-center px-4 animate-fadeIn whitespace-nowrap overflow-hidden text-ellipsis w-full">
-                            +{scoreLogs[0].gold} {scoreLogs[0].text}
+                            <span className="font-bold">+{scoreLogs[0].gold}</span>
+                            <span className="opacity-75 ml-1">
+                                {scoreLogs[0].text}
+                            </span>
                         </div>
                     )}
                 </div>

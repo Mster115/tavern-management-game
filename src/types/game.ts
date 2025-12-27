@@ -1,6 +1,6 @@
 export type GameState = 'START_SCREEN' | 'SHIFT_INTRO' | 'PLAYING' | 'SHIFT_SUMMARY';
 
-export type PatronType = 'PEASANT' | 'KNIGHT' | 'NOBLE' | 'WIZARD';
+export type PatronType = 'PEASANT' | 'KNIGHT' | 'NOBLE' | 'WIZARD' | 'ROYAL';
 
 export interface Patron {
     id: number;
@@ -20,12 +20,15 @@ export interface ScoreLog {
     gold: number;
     text: string;
     subText?: string;
+    baseVal?: number;
+    tipVal?: number;
 }
 
 export interface GameContextType {
     gameState: GameState;
     night: number;
     timeLeft: number;
+    maxTime: number;
     totalGold: number;
     currentShiftGold: number;
     patronsServed: number;

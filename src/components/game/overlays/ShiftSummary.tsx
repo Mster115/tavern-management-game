@@ -1,4 +1,5 @@
 import React from 'react';
+import { GoldCoin } from '../ui/GoldCoin';
 
 interface ShiftSummaryProps {
     night: number;
@@ -22,7 +23,7 @@ export const ShiftSummary: React.FC<ShiftSummaryProps> = ({ night, patronsServed
                 <div className="flex justify-between items-center bg-black/30 p-4 rounded text-amber-200">
                     <span>Gold Earned</span>
                     <span className="font-bold text-2xl text-yellow-400 drop-shadow-sm flex items-center gap-2">
-                        +{currentShiftGold} <span className="text-xl">⚱️</span>
+                        +{currentShiftGold} <span className="text-xl"><GoldCoin className="w-6 h-6" /></span>
                     </span>
                 </div>
             </div>

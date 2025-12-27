@@ -2,12 +2,11 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import type { GameState, Patron } from '../types/game';
 import {
     MAX_PATIENCE,
-    MIN_SPAWN_INTERVAL,
-    MAX_SPAWN_INTERVAL,
     DECAY_PER_SEC,
     BAR_PATIENCE_BOOST
 } from '../constants/game';
 import { generatePatron } from '../utils/patronGenerator';
+import { DifficultyStrategy } from '../strategies/difficulty';
 
 export const usePatronSystem = (gameState: GameState, night: number) => {
     const [queue, setQueue] = useState<Patron[]>([]);
@@ -22,22 +21,15 @@ export const usePatronSystem = (gameState: GameState, night: number) => {
         }
     }, [gameState]);
 
-    const getSpawnRate = useCallback(() => {
-        const reduction = (night - 1) * 1000;
-        const base = MAX_SPAWN_INTERVAL - reduction;
-        const randomness = Math.random() * 2000 - 1000;
-        return Math.max(MIN_SPAWN_INTERVAL, base + randomness);
-    }, [night]);
-
     const spawnPatron = useCallback((isInitial = false) => {
         if (!isInitial && gameStateRef.current !== 'PLAYING') return;
 
         const newPatron = generatePatron(night);
         setQueue(prev => [...prev, newPatron]);
 
-        const nextInterval = getSpawnRate();
+        const nextInterval = DifficultyStrategy.getSpawnInterval(night);
         spawnerRef.current = setTimeout(() => spawnPatron(false), nextInterval);
-    }, [getSpawnRate, night]);
+    }, [night]);
 
     // Patience and Leaving Logic Loop
     useEffect(() => {
@@ -48,8 +40,8 @@ export const usePatronSystem = (gameState: GameState, night: number) => {
             setQueue(prev => prev.map(p => {
                 if (p.status === 'leaving') return p;
 
-                const decay = DECAY_PER_SEC / (p.patienceMultiplier || 1);
-                const newPatience = Math.max(0, p.patience - decay);
+                const baseDecay = DifficultyStrategy.getPatienceDecay(DECAY_PER_SEC, p.patienceMultiplier);
+                const newPatience = Math.max(0, p.patience - baseDecay);
                 const nextStatus = newPatience === 0 ? 'angry' : p.status;
 
                 return { ...p, patience: newPatience, status: nextStatus as any };
@@ -60,8 +52,8 @@ export const usePatronSystem = (gameState: GameState, night: number) => {
                 if (!prev || prev.status === 'leaving') return prev;
 
                 // Active patrons also lose patience while waiting for their drink
-                const decay = DECAY_PER_SEC / (prev.patienceMultiplier || 1);
-                const newPatience = Math.max(0, prev.patience - decay);
+                const baseDecay = DifficultyStrategy.getPatienceDecay(DECAY_PER_SEC, prev.patienceMultiplier);
+                const newPatience = Math.max(0, prev.patience - baseDecay);
                 const nextStatus = newPatience === 0 ? 'angry' : prev.status;
 
                 return { ...prev, patience: newPatience, status: nextStatus as any };

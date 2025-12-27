@@ -5,78 +5,115 @@ const NAMES: Record<PatronType, string[]> = {
     PEASANT: ["Olaf", "Gunnar", "Helga", "Sigrid", "Bjorn", "Astrid", "Leif", "Inga"],
     KNIGHT: ["Sir Gallahad", "Dame Lancelot", "Sir Gawain", "Dame Brienne", "Sir Percival", "Dame Eowyn"],
     NOBLE: ["Lord Blackwood", "Lady Stark", "Baron Von Hein", "Countess Dracula", "Duke Leto", "Duchess Satine"],
-    WIZARD: ["Merlin", "Gandalf", "Radagast", "Morgana", "Dumbledore", "Saruman"]
+    WIZARD: ["Merlin", "Gandalf", "Radagast", "Morgana", "Dumbledore", "Saruman"],
+    ROYAL: ["King Arthur", "Queen Guinevere", "Prince Charming", "Princess Zelda", "Emperor Kuzco", "Queen Elizabeth"]
 };
 
-const RATES: Record<PatronType, number> = {
-    PEASANT: 0.5,
-    KNIGHT: 0.25,
-    NOBLE: 0.15,
-    WIZARD: 0.1
+// --- Weights System ---
+
+// Helper for weighted selection
+function selectWeighted<T>(items: { item: T; weight: number }[]): T {
+    const totalWeight = items.reduce((sum, i) => sum + i.weight, 0);
+    const rand = Math.random() * totalWeight;
+    let current = 0;
+    for (const i of items) {
+        current += i.weight;
+        if (rand < current) return i.item;
+    }
+    return items[items.length - 1].item;
+}
+
+// 1. Patron Type Weights (Base vs Late Game)
+// "Late Game" targets roughly Night 5+
+const TYPE_WEIGHTS_BASE: Record<PatronType, number> = {
+    PEASANT: 100,
+    KNIGHT: 10,
+    NOBLE: 5,
+    WIZARD: 2,
+    ROYAL: 0 // No royals on night 1
 };
 
-export const SPAWN_RATES = RATES;
+const TYPE_WEIGHTS_LATE: Record<PatronType, number> = {
+    PEASANT: 40,
+    KNIGHT: 40,
+    NOBLE: 30,
+    WIZARD: 20,
+    ROYAL: 10
+};
+
+// 2. Tipping Tier Weights per Class
+// Val = Gold Multiplier
+const TIPPING_WEIGHTS: Record<PatronType, { val: number; weight: number }[]> = {
+    PEASANT: [
+        { val: 0.8, weight: 20 }, // Cheap
+        { val: 1.0, weight: 70 }, // Normal
+        { val: 1.2, weight: 10 }  // Small Tip
+    ],
+    KNIGHT: [
+        { val: 1.2, weight: 30 },
+        { val: 1.5, weight: 50 },
+        { val: 1.8, weight: 20 }  // Tip
+    ],
+    NOBLE: [
+        { val: 2.5, weight: 40 },
+        { val: 3.0, weight: 40 },
+        { val: 4.5, weight: 20 }  // Big Tip
+    ],
+    WIZARD: [
+        { val: 2.0, weight: 20 },
+        { val: 3.5, weight: 50 },
+        { val: 6.0, weight: 30 }  // Magic Tip
+    ],
+    ROYAL: [
+        { val: 5.0, weight: 60 },
+        { val: 10.0, weight: 40 } // Royal Treasury
+    ]
+};
 
 export const generatePatron = (night: number = 1): Patron => {
-    const rand = Math.random();
+    // 1. Calculate Current Weights based on Night progress
+    // Interpolate between Base (Night 1) and Late (Night 5)
+    // progress: 0.0 (Night 1) -> 1.0 (Night 5+)
+    const progress = Math.min(1, (night - 1) / 4);
 
-    // Adjust spawn rates based on night
-    // As nights progress, Nobles and Wizards become more common
-    let rates = { ...SPAWN_RATES };
-    if (night > 1) {
-        const difficultyMod = Math.min((night - 1) * 0.05, 0.3); // Cap at 30% shift
-        rates.PEASANT = Math.max(0.1, RATES.PEASANT - difficultyMod);
-        rates.KNIGHT = RATES.KNIGHT; // Stay roughly same
-        rates.NOBLE = Math.min(0.35, RATES.NOBLE + (difficultyMod * 0.6));
-        rates.WIZARD = Math.min(0.25, RATES.WIZARD + (difficultyMod * 0.4));
-    }
+    const currentTypeWeights = Object.keys(TYPE_WEIGHTS_BASE).map(key => {
+        const type = key as PatronType;
+        const start = TYPE_WEIGHTS_BASE[type];
+        const end = TYPE_WEIGHTS_LATE[type];
+        const currentWeight = start + (end - start) * progress;
+        return { item: type, weight: currentWeight };
+    });
 
-    let type: PatronType = 'PEASANT';
-    let cumulative = 0;
+    // 2. Select Type
+    const type = selectWeighted(currentTypeWeights);
 
-    for (const [t, rate] of Object.entries(rates)) {
-        cumulative += rate;
-        if (rand < cumulative) {
-            type = t as PatronType;
-            break;
-        }
-    }
-
-    const nameList = NAMES[type];
+    // 3. Select Details
+    const nameList = NAMES[type] || NAMES.PEASANT;
     const name = nameList[Math.floor(Math.random() * nameList.length)];
 
-    let patienceMultiplier = 1.0;
-    let goldMultiplier = 1.0;
+    // 4. Select Gold Multiplier from Tipping Table
+    const tippingOptions = TIPPING_WEIGHTS[type].map(t => ({ item: t.val, weight: t.weight }));
+    const goldMultiplier = selectWeighted(tippingOptions);
 
+    // 5. Patience Calculation (Difficulty Scaling)
+    let patienceMultiplier = 1.0;
     switch (type) {
-        case 'PEASANT':
-            patienceMultiplier = 1.0;
-            goldMultiplier = 1.0;
-            break;
-        case 'KNIGHT':
-            patienceMultiplier = 1.2;
-            goldMultiplier = 1.5;
-            break;
-        case 'NOBLE':
-            patienceMultiplier = 0.8;
-            goldMultiplier = 3.0;
-            break;
-        case 'WIZARD':
-            patienceMultiplier = 0.5;
-            goldMultiplier = 5.0;
-            break;
+        case 'PEASANT': patienceMultiplier = 1.0; break;
+        case 'KNIGHT': patienceMultiplier = 1.2; break; // Knights endure more
+        case 'NOBLE': patienceMultiplier = 0.8; break;
+        case 'WIZARD': patienceMultiplier = 0.6; break; // Wizards are impatient
+        case 'ROYAL': patienceMultiplier = 0.5; break; // Royals want it NOW
     }
 
-    // Difficulty scaling: global patience reduction per night
-    // 5% faster patience decay per night, capped at 50% faster
-    const difficultyPatienceMod = Math.max(0.5, 1 - ((night - 1) * 0.05));
-    patienceMultiplier *= difficultyPatienceMod;
+    // Global Patience Decay Scaling (5% faster per night, max 50%)
+    const difficultyMod = Math.max(0.5, 1 - ((night - 1) * 0.05));
+    patienceMultiplier *= difficultyMod;
 
     return {
         id: Date.now(),
         name,
         type,
-        displayName: `${type === 'KNIGHT' || type === 'NOBLE' ? '' : 'The '}${type} ${name}`,
+        displayName: `${name}`,
         arrivalTime: Date.now(),
         patience: MAX_PATIENCE,
         patienceMultiplier,

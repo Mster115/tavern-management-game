@@ -1,12 +1,10 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import type { GameState, ScoreLog, GameContextType } from '../types/game';
-import {
-    ROUND_DURATION,
-    TOLERANCE,
-    MAX_PATIENCE
-} from '../constants/game';
 import { usePatronSystem } from '../hooks/usePatronSystem';
 import { useGameLoop } from '../hooks/useGameLoop';
+
+import { DifficultyStrategy } from '../strategies/difficulty';
+import { ScoringStrategy } from '../strategies/scoring';
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
@@ -14,6 +12,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // --- State ---
     const [gameState, setGameState] = useState<GameState>('START_SCREEN');
     const [night, setNight] = useState(1);
+    const [maxTime, setMaxTime] = useState(45); // Default start time
 
     // Hooks
     const endRound = useCallback(() => {
@@ -39,9 +38,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const startRound = () => {
         setGameState('PLAYING');
-        setTimeLeft(ROUND_DURATION);
+        // Use DifficultyStrategy for centralized timing logic
+        const duration = DifficultyStrategy.getShiftDuration(night);
+
+        setMaxTime(duration);
+        setTimeLeft(duration);
         setFeedback('');
-        // spawnPatron() is now handled by effect in usePatronSystem
     };
 
     const startShift = () => {
@@ -51,6 +53,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setScoreLogs([]);
         setFeedback('');
         resetSystem();
+
+        // Calculate duration early for display purposes if needed, 
+        // effectively pre-loading the Next Night's duration
+        const nextDuration = DifficultyStrategy.getShiftDuration(night);
+        setMaxTime(nextDuration);
 
         setTimeout(() => {
             startRound();
@@ -66,43 +73,23 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const submitPour = useCallback((error: number) => {
         if (!activePatron || feedback) return;
 
-        // Base Reward based on Pour Quality
-        let baseGold = 0;
-        let baseText = "";
+        // Use ScoringStrategy
+        const result = ScoringStrategy.calculatePourScore(error, activePatron);
 
-        if (error <= 1) {
-            baseGold = 50;
-            baseText = "Perfect Pour!";
-        } else if (error <= TOLERANCE) {
-            baseGold = 35;
-            baseText = "Tasty!";
-        } else if (error <= TOLERANCE * 2) {
-            baseGold = 15;
-            baseText = "Meh.";
-        } else {
-            baseGold = 5;
-            baseText = "Yuck.";
-        }
-
-        // Multiplier based on Patience (0.5 to 1.0)
-        // Even at 0 patience, you get 50% of the value.
-        const patienceRatio = activePatron.patience / MAX_PATIENCE;
-        const patienceMultiplier = 0.5 + (0.5 * patienceRatio);
-
-        const finalGold = Math.floor(baseGold * patienceMultiplier);
-
-        setTotalGold(prev => prev + finalGold);
-        setCurrentShiftGold(prev => prev + finalGold);
+        setTotalGold(prev => prev + result.finalGold);
+        setCurrentShiftGold(prev => prev + result.finalGold);
         setPatronsServed(prev => prev + 1);
-        setFeedback(`${baseText}`);
+        setFeedback(result.feedbackText);
 
-        const multiplierPercent = Math.round(patienceMultiplier * 100);
+        const multiplierPercent = Math.round(result.patienceMultiplier * 100);
 
         setScoreLogs(prev => [{
             id: Date.now(),
-            gold: finalGold,
-            text: baseText,
-            subText: patienceMultiplier < 0.9 ? `${multiplierPercent}% Patience` : undefined
+            gold: result.finalGold,
+            text: result.feedbackText,
+            baseVal: result.baseGold,
+            tipVal: result.tipVal,
+            subText: result.patienceMultiplier < 0.9 ? `${multiplierPercent}% Patience` : undefined
         }, ...prev]);
 
         // Clear patron after delay
@@ -113,12 +100,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         }, 1500);
 
-    }, [activePatron, gameState, clearActivePatron]);
+    }, [activePatron, gameState, clearActivePatron, feedback]);
 
     const value = {
         gameState,
         night,
         timeLeft,
+        maxTime,
         totalGold,
         currentShiftGold,
         patronsServed,

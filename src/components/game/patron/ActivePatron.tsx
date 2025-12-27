@@ -49,7 +49,22 @@ export const ActivePatron: React.FC = () => {
                                     {isAngry ? "I'm out of here! Terribly slow service!" : feedback}
                                 </p>
                                 {showGold && latestLog && !isAngry && (
-                                    <p className="text-green-600 font-bold mt-1 text-sm">+{latestLog?.gold} Gold</p>
+                                    <div className="flex flex-col items-center w-full">
+                                        <p className="text-green-600 font-bold text-xl drop-shadow-sm">+{latestLog?.gold} Gold</p>
+
+                                        {(latestLog?.tipVal !== undefined && latestLog?.tipVal !== 0) && (
+                                            <div className="w-full mt-1 pt-1 border-t border-gray-200/50 flex flex-col gap-0.5 px-2">
+                                                <div className="flex justify-between text-[10px] text-gray-600 font-serif">
+                                                    <span>Brew:</span>
+                                                    <span>{latestLog.baseVal}</span>
+                                                </div>
+                                                <div className="flex justify-between text-[10px] text-green-600 font-serif font-bold">
+                                                    <span>Tip:</span>
+                                                    <span>{latestLog.tipVal > 0 ? '+' : ''}{latestLog.tipVal}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         </div>
