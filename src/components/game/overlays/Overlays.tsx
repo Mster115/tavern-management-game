@@ -6,7 +6,7 @@ import { ShiftSummary } from './ShiftSummary';
 import { GameOverScreen } from './GameOverScreen';
 
 export const Overlays: React.FC = () => {
-    const { gameState, night, totalGold, patronsServed, currentShiftGold, startShift, nextNight, resetGame, angryPatronCount, angryLimit } = useGame();
+    const { gameState, night, totalGold, patronsServed, currentShiftGold, startShift, nextNight, resetGame, angryPatronCount, angryLimit, gameOverReason } = useGame();
 
     if (gameState === 'PLAYING') return null;
 
@@ -42,6 +42,7 @@ export const Overlays: React.FC = () => {
                     patronsServed={patronsServed}
                     angryCount={angryPatronCount}
                     limit={angryLimit}
+                    reason={gameOverReason}
                     onReset={resetGame}
                 />
             )}

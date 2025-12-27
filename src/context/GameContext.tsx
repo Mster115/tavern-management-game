@@ -24,14 +24,25 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // --- Actions (Defined early for hooks) ---
     const [angryPatronCount, setAngryPatronCount] = useState(0);
+    const [gameOverReason, setGameOverReason] = useState<'LIMIT_REACHED' | 'ROYAL_SCANDAL' | null>(null);
 
-    const registerAngryPatron = useCallback(() => {
+    const registerAngryPatron = useCallback((type?: import('../types/game').PatronType) => {
         setAngryPatronCount(prev => {
+            // Royal Riot Mechanic: 5% chance to instant fail
+            if (type === 'ROYAL') {
+                if (Math.random() < 0.05) {
+                    setGameOverReason('ROYAL_SCANDAL');
+                    setTimeout(() => setGameState('GAME_OVER'), 0);
+                    return prev + 1;
+                }
+            }
+
             const newVal = prev + 1;
             // Use the current night's limit (accessed via closure if possible, but wait... 
             // registerAngryPatron depends on 'angryLimit' which depends on 'night'.
             // So we must add [angryLimit] to dependency array.
             if (newVal >= angryLimit) {
+                setGameOverReason('LIMIT_REACHED');
                 setTimeout(() => setGameState('GAME_OVER'), 0);
             }
             return newVal;
@@ -166,6 +177,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         patronsServed,
         angryPatronCount,
         angryLimit,
+        gameOverReason,
         queue,
         activePatron,
         scoreLogs,
@@ -190,6 +202,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         angryLimit,
         queue,
         activePatron,
+        gameOverReason,
         scoreLogs,
         feedback,
         // unlockedDrinks is derived from night, so it's stable if night is stable

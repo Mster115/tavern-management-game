@@ -8,7 +8,7 @@ import {
 import { generatePatron } from '../utils/patronGenerator';
 import { DifficultyStrategy } from '../strategies/difficulty';
 
-export const usePatronSystem = (gameState: GameState, night: number, onPatronAngry: () => void, isPaused: boolean = false) => {
+export const usePatronSystem = (gameState: GameState, night: number, onPatronAngry: (type: import('../types/game').PatronType) => void, isPaused: boolean = false) => {
     const [queue, setQueue] = useState<Patron[]>([]);
     const [activePatron, setActivePatron] = useState<Patron | null>(null);
     const spawnerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -45,7 +45,7 @@ export const usePatronSystem = (gameState: GameState, night: number, onPatronAng
                 const nextStatus = newPatience === 0 ? 'angry' : p.status;
 
                 if (nextStatus === 'angry' && p.status !== 'angry') {
-                    onPatronAngry();
+                    onPatronAngry(p.type);
                 }
 
                 return { ...p, patience: newPatience, status: nextStatus as any };
@@ -62,7 +62,7 @@ export const usePatronSystem = (gameState: GameState, night: number, onPatronAng
                     const nextStatus = newPatience === 0 ? 'angry' : prev.status;
 
                     if (nextStatus === 'angry' && prev.status !== 'angry') {
-                        onPatronAngry();
+                        onPatronAngry(prev.type);
                     }
 
                     return { ...prev, patience: newPatience, status: nextStatus as any };

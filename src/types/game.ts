@@ -36,6 +36,7 @@ export interface GameContextType {
     patronsServed: number;
     angryPatronCount: number;
     angryLimit: number; // Dynamic limit based on night
+    gameOverReason: 'LIMIT_REACHED' | 'ROYAL_SCANDAL' | null;
     queue: Patron[];
     activePatron: Patron | null;
     scoreLogs: ScoreLog[];
@@ -49,5 +50,5 @@ export interface GameContextType {
     resetGame: () => void;
     submitPour: (accuracyMetric: number, drinkType: import('./game').DrinkType) => void;
     spawnPatron: () => void;
-    registerAngryPatron: () => void;
+    registerAngryPatron: (type?: PatronType) => void;
 }

@@ -10,6 +10,7 @@ interface GameOverScreenProps {
     patronsServed: number;
     angryCount: number;
     limit: number;
+    reason: 'LIMIT_REACHED' | 'ROYAL_SCANDAL' | null;
     onReset: () => void;
 }
 
@@ -23,7 +24,7 @@ const RIOTERS: { type: PatronType, x: string, y: string, delay: number, duration
     { type: 'NOBLE', x: '85%', y: '30%', delay: 1.2, duration: 2.6 },
 ];
 
-export const GameOverScreen: React.FC<GameOverScreenProps> = ({ night, totalGold, patronsServed, angryCount, limit, onReset }) => {
+export const GameOverScreen: React.FC<GameOverScreenProps> = ({ night, totalGold, patronsServed, angryCount, limit, reason, onReset }) => {
     const [shake, setShake] = useState(false);
 
     useEffect(() => {
@@ -99,10 +100,20 @@ export const GameOverScreen: React.FC<GameOverScreenProps> = ({ night, totalGold
                         </div>
                         <div className="flex flex-col col-span-2 border-t border-red-800/30 pt-4">
                             <span className="text-xs uppercase tracking-wider text-red-300">Cause of Riot</span>
-                            <div className="flex items-center gap-2">
-                                <span className="text-3xl text-red-500 font-black">{angryCount}</span>
-                                <span className="text-sm text-red-300 uppercase tracking-widest">Angry Patrons</span>
-                            </div>
+                            {reason === 'ROYAL_SCANDAL' ? (
+                                <div className="flex flex-col items-center">
+                                    <span className="text-2xl text-purple-400 font-black tracking-widest uppercase">Royal Scandal!</span>
+                                    <span className="text-[10px] text-purple-300/70 uppercase mt-1">An offended Royal shut you down</span>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-3xl text-red-500 font-black">{angryCount} / {limit}</span>
+                                        <span className="text-sm text-red-300 uppercase tracking-widest">Angry Patrons</span>
+                                    </div>
+                                    <span className="text-[10px] text-red-400/50 uppercase mt-1">Allowed per shift</span>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
